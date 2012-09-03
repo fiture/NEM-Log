@@ -1,0 +1,16 @@
+extends layout
+block content
+  h2= title
+  form( method="post")
+    div#content
+      h3 Title
+      input(type="text", name="title", id="editArticleTitle", class="edit-ipt")
+      p Postname
+      input(type="text", name="postname", id="postname", class="edit-ipt")
+      div
+        h3 Content
+        textarea( name="content", rows=10, id="editArticleBody", class="edit-textarea")
+        p Tags
+        input(type="text", name="tags", id="tags", class="edit-ipt")
+        p
+          input(type="submit", value="Publish", class="btn btn-primary")

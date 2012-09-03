@@ -1,0 +1,10 @@
+{
+  "name": "verybus",
+  "version": "0.0.1",
+  "private": true,
+  "dependencies": {
+    "express": "*",
+    "jade": "*",
+    "mongodb": ">=0.9.6-7"
+  }
+}

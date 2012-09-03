@@ -1,0 +1,9 @@
+body { font-family:"Microsoft YaHei", Arial, Helvetica, Sans-Serif;}
+#container { padding:50px 0 0;}
+.edit-ipt { width:50%;}
+.edit-textarea { width:70%; resize:none; }
+.btn-group { text-align:right;}
+#footer { color: #999;}
+#signup-form .control-label { text-align:left;}
+#login-form .control-label { text-align:left;}
+#login-form .signup { font-size:12px; margin:10px 0 0;}

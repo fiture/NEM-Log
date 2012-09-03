@@ -1,0 +1,17 @@
+extends layout
+
+block content
+  h1= title
+  p A simple blog...
+  div#newpost.btn-group
+    a(href="/new-post/", class="btn")!= 'New post'
+    a(href="/login/", class="btn")!= 'Log In'
+
+  div#articles
+    each post in posts
+      div.post
+        h2
+          a(href="/post/"+post.postname) #{post.title}  
+        div.post-meta
+          div.post-date Date: #{post.date}
+          div.post-content !{post.content}
