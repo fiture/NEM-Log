@@ -1,16 +1,22 @@
 extends layout
-
 block content
-  h2 Edit #{title}
-  form( method="post", action="/edit-post/"+post._id.toHexString()+"/save")
+  h2= title
+  form( method="post")
     div#content
       h3 Title
       input(type="text", name="title", class="edit-ipt", value=[title])
-      p Postname
-      input(type="text", name="postname", id="postname", class="edit-ipt", value=[post.postname])
-      h3 Content
-      textarea(name="content", class="edit-textarea", rows="10")= post.content
-      p Tags
-      input(type="text", name="tags", id="tags", class="edit-ipt", value=[tags])
-      p
-        input(type="submit", value="Publish", class="btn btn-primary")
+      div
+        h3 Content
+        textarea( name="content", rows=10,  class="edit-textarea")= post.content 
+        p Category
+        select(name="category")
+          option(value="default", selected) Default
+          option(value="life") Life
+        p Postname
+        input(type="text", name="postname", class="edit-ipt", value=[post.postname])
+        p Tags
+        input(type="text", name="tags", class="edit-ipt", value=[tags])
+        if (typeof error != 'undefined')
+          p=error
+        p
+          input(type="submit", value="Publish", class="btn btn-primary")

@@ -9,8 +9,10 @@ block content
   div.post-meta
     div.post-date Date: #{post.date}
     div.btn-group
-      a(href="/edit-post/"+post._id.toHexString()).btn Edit
+      a(href="/edit-post/"+post._id).btn Edit
       | &nbsp; &nbsp;
-      a(href="/delete-post/"+post._id.toHexString()).btn Delete
+      a(href="/delete-post/"+post._id).btn Delete
   div.post
     div.post-content !{post.content} 
+    div.category 分类: !{post.category}
+    div.tags 标签: !{post.tags}

@@ -1,88 +1,102 @@
-Post = require '../modules/post'
-post = new Post()
+modules = require '../modules'
+Post = modules.Post
 
-getPostById = (req,res)->
-    post.getById req.params.id, (err, post)->
-      if err
-        return res.send err
-      res.render 'blog_show',
-      {
-        title: post.title
-        post: post
-      }
+#New post
+exports.newPost = (req, res, next) ->
+  method = req.method.toLowerCase()
+  if method is 'get'
+    res.render 'blog_new', {title:'New Post'}
 
-getPost = (req,res)->
-    post.getPost {'postname': req.params.name}, (err, post)->
-      if err
-        return res.send err
-      res.render 'blog_show',
-      {
-        title: post.title
-        post: post
-      }
+  if method is 'post'
+    title = req.body.title
+    content = req.body.content
+    if not title or not content
+      res.render 'blog_new', {title:'New Post', error:'标题和内容不能为空！'}
+      return
 
-getPosts = (req,res)->
-    post.getPosts (err, result)->
-      res.render 'index',
-      {
-        title: 'NEM-Log'
-        posts: result
-      }
-showNewPost = (req,res)->
-    res.render 'blog_new',
-    {
-      title: 'New Post'
-    }
+    tags = if req.body.tags then req.body.tags.split(',') else []
+    category = if req.body.category then req.body.category else 'default'
+    postname = if req.body.postname then req.body.postname else title
+    postname = postname.replace(/\s+|\s/g, '-').toLocaleLowerCase()
 
-newPost = (req,res)->
-    tags = req.body['tags'].split(',')
-    if req.body['postname']
-      postname = req.body['postname']
-    else
-      postname = req.body['title']
-    postname =postname.replace(/\s+|\s/g, '-').toLocaleLowerCase()
-
-    newpost =
-      title: req.body['title']
-      content: req.body['content']
+    post = new Post({
+      title: title
+      content: content
       postname: postname
+      category: category
       tags: tags
       date: new Date()
-    post.newPost newpost ,(err, result)->
-      res.redirect('/')
+      update: new Date()
+    })
+    post.save (err)->
+      if err
+        next(err)
+      else
+        res.redirect '/'
 
-showEditPost = (req,res)->
-  post.getById req.params.id, (err, post)->
+#Get post by id
+exports.getPostById = (req, res) ->
+  query = Post.findById(req.params.id)
+  query.exec (err, post) ->
     if err
-      return res.send err
-    res.render 'blog_edit',
+      handleError err
+    res.render 'blog_show',
     {
-      title: post.title,
-      post: post,
-      tags: post.tags.join(',')
+      title: post.title
+      post: post
     }
+#Get post by postname
+exports.getPost = (req, res) ->
+  query = Post.findOne({'postname':req.params.name})
+  query.exec (err, post) ->
+    if err
+      handleError err
+    res.render 'blog_show',
+    {
+      title: post.title
+      post: post
+    }
+exports.getIndex = (req, res) ->
+  query = Post.find().limit(10).sort('-date').exec (err, posts) -> 
+    res.render 'index',
+    {
+      title: 'NEM-Log'
+      posts: posts
+    }
+exports.editPost = (req, res) ->
+  method = req.method.toLowerCase()
+  if method is 'get'
+    Post.findById(req.params.id).exec (err, post)->
+      if err
+        return res.send err
+      res.render 'blog_edit',
+      {
+        title: post.title,
+        post: post,
+        tags: post.tags.join(',')
+      }
+  if method is 'post'
+    title = req.body.title
+    content = req.body.content
+    tags = if req.body.tags then req.body.tags.split(',') else []
+    category = if req.body.category then req.body.category else 'default'
+    postname = if req.body.postname then req.body.postname else title
+    postname = postname.replace(/\s+|\s/g, '-').toLocaleLowerCase()
 
-editPost = (req,res)->
-  tags = req.body['tags'].split(',')
-  if req.body['postname']
-    postname = req.body['postname']
-  else
-    postname = req.body['title']
-  postname =postname.replace(/\s+|\s/g, '-').toLocaleLowerCase()
+    Post.findById req.params.id, (err, post)->
+      post.title = title
+      post.content = content
+      post.tags = tags
+      post.category = category
+      post.postname = postname
+      post.update = new Date()
 
-  data =
-    title: req.body['title']
-    content: req.body['content']
-    postname: postname
-    tags: tags
-  post.update req.params.id, data, (err, post)->
-   res.redirect('/')
+      post.save (err)->
+        if err
+          next(err)
+        else
+          res.redirect '/'
 
-
-
-exports.getPosts = getPosts
-exports.getPost = getPost
-exports.showNewPost = showNewPost
-exports.newPost = newPost
-exports.showEditPost = showEditPost
-exports.editPost = editPost
+exports.deletePost = (req, res) ->
+  Post.findById(req.params.id).remove (err) ->
+    res.redirect '/'
